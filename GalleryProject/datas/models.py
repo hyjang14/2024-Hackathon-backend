@@ -14,6 +14,9 @@ class DataModel(models.Model):
     contact = models.CharField(max_length=200, null=True) # CONTACT_POINT 전화번호
     audience = models.CharField(max_length=200, null=True) # AUDIENCE 전체관람
 
+    def scrap_count(self):
+        return self.scrap_set.count()
+
 
 # 전시 스크랩 기능
 User = get_user_model()
@@ -26,3 +29,13 @@ class Scrap(models.Model):
     class Meta:
         # 동일한 사용자가 동일한 데이터 중복으로 스크랩하지 못하게 함
         unique_together = ['user', 'data'] 
+
+# 댓글 
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments',  default="")
+    comment = models.CharField(verbose_name="댓글", max_length=128)
+    data = models.ForeignKey(DataModel, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.comment

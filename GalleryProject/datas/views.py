@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from .models import DataModel, Scrap # model
-from .serializers import DataSerializer, ScrapSerializer # serializer
+from .models import DataModel, Scrap, Comment # model
+from .serializers import DataSerializer, ScrapSerializer, CommentSerializer # serializer
 
 # 스크랩
 from rest_framework import generics
@@ -16,7 +16,13 @@ from django.http import HttpResponse # HTTP 응답을 위한 클래스
 import xml.etree.ElementTree as ET
 import json
 
+# 전시 검색
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
+
 from rest_framework.permissions import AllowAny
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwnerOrReadOnly  # 커스텀 권한 클래스 임포트
 
 
 class DataViewSet(ModelViewSet):
@@ -27,7 +33,10 @@ class DataViewSet(ModelViewSet):
 
     queryset = DataModel.objects.all().order_by('id') # 모든 객체를 ID 순으로 정렬하여 쿼리셋으로 설정
     serializer_class = DataSerializer # Serializers를 사용하여 데이터 직렬화
-
+    
+    # 전시 검색 
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    search_fields = ('title',) # 제목으로 검색할 수 있게 함
 
 def Dataload(request):
     time.sleep(3)  # 1초간의 지연을 추가합니다.
@@ -129,3 +138,23 @@ class ScrapDeleteView(generics.DestroyAPIView):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+# 댓글
+class CommentViewSet(ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    # 자신이 쓴 댓글만 수정/삭제할 수 있도록
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def perform_create(self, serializer):
+        exhibition_id = self.kwargs.get('exhibition_id')
+        exhibition = DataModel.objects.get(pk=exhibition_id)  # Exhibition 모델에서 가져옴
+        serializer.save(user=self.request.user, data=exhibition)
+
+
+    def get_queryset(self):
+        exhibition_id = self.kwargs.get('exhibition_id')
+        if exhibition_id:
+            return self.queryset.filter(data=exhibition_id)
+        return self.queryset

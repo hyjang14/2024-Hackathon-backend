@@ -1,10 +1,13 @@
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
-from .views import DataViewSet, Dataload, ScrapCreateView, ScrapDeleteView, ScrapView, ExhibitionScrapListView
+from .views import DataViewSet, Dataload, ScrapCreateView, ScrapDeleteView, ScrapView, ExhibitionScrapListView, CommentViewSet
 
 
 data_router = SimpleRouter()
 data_router.register('data', DataViewSet)
+
+comment_router = SimpleRouter(trailing_slash=False)
+comment_router.register('comments', CommentViewSet, basename='comment')
 
 urlpatterns = [
     # 데이터베이스를 초기화하거나 갱신할때만 사용
@@ -21,4 +24,7 @@ urlpatterns = [
     path('scraps/<int:exhibition_id>/', ExhibitionScrapListView.as_view(), name='exhibition-scrap-view'),
     # 스크랩 삭제
     path('scraps/<int:exhibition_id>/delete/', ScrapDeleteView.as_view(), name='scrap-delete'),
+
+    # 댓글
+    path('datas/<int:exhibition_id>/', include(comment_router.urls)),
 ]

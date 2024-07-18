@@ -59,7 +59,10 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # apps
-    'accounts', 'datas'
+    'accounts', 'datas', 'posts', 'infos',
+
+    # cors 에러
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -73,6 +76,23 @@ MIDDLEWARE = [
 
     # drf 인증 패키지 추가
     'allauth.account.middleware.AccountMiddleware', 
+
+    # cors 에러
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+]
+
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
+)
+CORS_ALLOW_METHODS = [
+	'DELETE',
+	'GET',
+	'OPTIONS',
+	'PATCH',
+	'POST',
+	'PUT',
 ]
 
 # drf 인증 패키지 추가
@@ -84,6 +104,22 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    # django_filters
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+    ],
+
+    # CamelCaseJSON 관련 설정
+	'DEFAULT_RENDERER_CLASSES': (
+	'djangorestframework_camel_case.render.CamelCaseJSONRenderer', 
+	'djangorestframework_camel_case.render.CamelCaseBrowsableAPIRenderer',
+	),
+	'DEFAULT_PARSER_CLASSES': (
+	'djangorestframework_camel_case.parser.CamelCaseFormParser', 
+	'djangorestframework_camel_case.parser.CamelCaseMultiPartParser',
+	'djangorestframework_camel_case.parser.CamelCaseJSONParser',
+	),
 }
 
 ROOT_URLCONF = 'GalleryProject.urls'
