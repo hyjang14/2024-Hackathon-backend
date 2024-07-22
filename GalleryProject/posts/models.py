@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -9,8 +10,36 @@ class Post(models.Model) :
     img = models.ImageField(verbose_name="사진", blank=True, upload_to='posts_photo')
     view_at = models.DateTimeField(verbose_name="관람일", auto_now_add=True)
     created_at = models.DateTimeField(verbose_name="작성일", auto_now_add=True)
-    # likes = models.PositiveIntegerField(verbose_name="좋아요", default=0)
-    writer = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    writer = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='posts_posts')
+
+     # 제목 15글자 제한
+    def save(self, *args, **kwargs):
+        if len(self.title) > 15:
+            raise ValidationError("제목은 15글자를 초과할 수 없습니다.")
+        super(Post, self).save(*args, **kwargs)
+
+    def like_count(self):
+        return self.like_set.count()
     
     def __str__(self):
         return self.title
+    
+
+# 기록하기 좋아요 기능
+class Like(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='likes')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)  # Post 모델과 연결
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # 동일한 사용자가 동일한 기록을 중복으로 좋아요 누르지 못하게 함
+        unique_together = ['user', 'post'] 
+
+class Analysis(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='analysis_results')
+    analysis = models.TextField(verbose_name="분석 결과")
+    happiness = models.FloatField(verbose_name="행복 퍼센트", null=True, blank=True, default=0.0)
+    sadness = models.FloatField(verbose_name="슬픔 퍼센트", null=True, blank=True, default=0.0)
+    anger = models.FloatField(verbose_name="분노 퍼센트", null=True, blank=True, default=0.0)
+    anxiety = models.FloatField(verbose_name="불안 퍼센트", null=True, blank=True, default=0.0)
+    created_at = models.DateTimeField(verbose_name="작성일", auto_now_add=True)

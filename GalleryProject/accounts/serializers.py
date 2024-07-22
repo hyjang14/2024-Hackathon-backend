@@ -1,31 +1,41 @@
 from rest_framework import serializers
 from .models import User
 
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+
 # 회원가입
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True, label='Confirm password')
+    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    password_confirm = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'password', 'password_confirm', 'name', 'nickname', 'email', 'birthdate', 'phone', 'profile']
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'password_confirm': {'write_only': True},
+        }
 
-    # 비밀번호 일치 유효성 검사
+    # 비밀번호 유효성 검사
     def validate(self, data):
-        if data['password'] != data['password2']:
-            raise serializers.ValidationError("비밀번호가 일치하지 않습니다.")
+        password = data.get('password')
+        password_confirm = data.get('password_confirm')
+
+        # 비밀번호 확인 검사
+        if password != password_confirm:
+            raise serializers.ValidationError({'password_confirm': '비밀번호가 일치하지 않습니다.'})
+
+        # 비밀번호 유효성 검사
+        try:
+            validate_password(password)
+        except ValidationError as e:
+            raise serializers.ValidationError({'password': e.messages})
+
         return data
-    
-    # 아이디 중복 유효성 검사
-    def validate_username(self, value):
-        if User.objects.filter(username=value).exists():
-            raise serializers.ValidationError("이미 존재하는 아이디입니다.")
-        return value
-    
-    # 닉네임 중복 유효성 검사
-    def validate_nickname(self, value):
-        if User.objects.filter(nickname=value).exists():
-            raise serializers.ValidationError("이미 존재하는 닉네임입니다.")
-        return value
 
     def create(self, validated_data):
-        validated_data.pop('password2')  # password2는 DB에 필요없는 칸이므로 삭제
+
         user = User.objects.create_user(
             username=validated_data['username'],
             password=validated_data['password'],
@@ -38,9 +48,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'password', 'password2', 'name', 'nickname', 'email', 'birthdate', 'phone', 'profile']
 
 
 # 회원정보 수정

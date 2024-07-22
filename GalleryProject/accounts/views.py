@@ -1,15 +1,30 @@
 from .models import User
 from .serializers import UserSerializer, UserUpdateSerializer, ProfileSerializer
-from rest_framework import viewsets, generics, permissions
+from rest_framework import viewsets, generics, status
 from .permissions import CustomReadOnly
 from rest_framework.permissions import AllowAny
 
+from rest_framework.response import Response
+from rest_framework import serializers
+
+
 # 회원가입
 class UserViewSet(viewsets.ModelViewSet):
-    # 인증없어도 누구나 할 수 있도록 함
     permission_classes = [AllowAny]
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 # 회원정보 수정
 class UserUpdateView(generics.UpdateAPIView):

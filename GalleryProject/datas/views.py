@@ -52,19 +52,27 @@ def Dataload(request):
     
     item_list = []
     for item in items.findall('item'):
-        item_dict = {
-            'TITLE': item.find('TITLE').text,
-            'DESCRIPTION': item.find('DESCRIPTION').text,
-            'IMAGE_OBJECT': item.find('IMAGE_OBJECT').text,
-            'URL': item.find('URL').text,
-            'AUTHOR': item.find('AUTHOR').text,
-            'PERIOD': item.find('PERIOD').text,
-            'EVENT_PERIOD': item.find('EVENT_PERIOD').text,
-            'CNTC_INSTT_NM': item.find('CNTC_INSTT_NM').text,
-            'CONTACT_POINT': item.find('CONTACT_POINT').text,
-            'AUDIENCE': item.find('AUDIENCE').text,
-        }
-        item_list.append(item_dict)
+        period_text = item.find('PERIOD').text
+        
+        # 'PERIOD'가 연도를 포함하는지 확인하고 필터링
+        try:
+            period_year = int(period_text[:4])  # 첫 4자리를 연도로 파싱
+        except ValueError:
+            continue 
+        if period_year >= 2019:
+            item_dict = {
+                'TITLE': item.find('TITLE').text,
+                'DESCRIPTION': item.find('DESCRIPTION').text,
+                'IMAGE_OBJECT': item.find('IMAGE_OBJECT').text,
+                'URL': item.find('URL').text,
+                'AUTHOR': item.find('AUTHOR').text,
+                'PERIOD': item.find('PERIOD').text,
+                'EVENT_PERIOD': item.find('EVENT_PERIOD').text,
+                'CNTC_INSTT_NM': item.find('CNTC_INSTT_NM').text,
+                'CONTACT_POINT': item.find('CONTACT_POINT').text,
+                'AUDIENCE': item.find('AUDIENCE').text,
+            }
+            item_list.append(item_dict)
 
     # JSON으로 변환
     json_data = json.dumps(item_list)
