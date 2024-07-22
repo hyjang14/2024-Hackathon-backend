@@ -11,11 +11,17 @@ class Post(models.Model) :
     view_at = models.DateTimeField(verbose_name="관람일", auto_now_add=True)
     created_at = models.DateTimeField(verbose_name="작성일", auto_now_add=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='posts_posts')
+    username = models.CharField(max_length=150, blank=True, editable=False)
+    profile = models.URLField(max_length=200, blank=True, editable=False) 
 
      # 제목 15글자 제한
     def save(self, *args, **kwargs):
         if len(self.title) > 15:
             raise ValidationError("제목은 15글자를 초과할 수 없습니다.")
+        if not self.username:
+            self.username = self.writer.username  # 유저네임을 자동으로 설정
+        if not self.profile and hasattr(self.writer, 'profile'):
+            self.profile = self.writer.profile.url 
         super(Post, self).save(*args, **kwargs)
 
     def like_count(self):

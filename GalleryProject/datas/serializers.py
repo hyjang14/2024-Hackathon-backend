@@ -13,6 +13,9 @@ class DataSerializer(serializers.ModelSerializer):
 
 # 스크랩
 class ScrapSerializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    data = serializers.PrimaryKeyRelatedField(read_only=True)
+    
     class Meta:
         model = Scrap
         fields = ['id', 'user', 'data', 'created_at']
@@ -20,6 +23,12 @@ class ScrapSerializer(serializers.ModelSerializer):
 # 댓글
 class CommentSerializer(serializers.ModelSerializer):
     data = serializers.PrimaryKeyRelatedField(queryset=DataModel.objects.all())
+    created_at = serializers.DateTimeField(format="%m/%d", read_only=True)
+    username = serializers.CharField(read_only=True)
+    profile = serializers.URLField(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    data = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'data', 'comment', 'created_at']
+        fields = ['id', 'user', 'data', 'comment', 'created_at', 'username', 'profile']

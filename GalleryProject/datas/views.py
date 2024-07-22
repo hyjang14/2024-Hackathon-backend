@@ -109,7 +109,15 @@ class ScrapCreateView(generics.CreateAPIView):
     serializer_class = ScrapSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        data_id = self.kwargs.get('data_id')
+        
+        try:
+            data_instance = DataModel.objects.get(id=data_id)
+        except DataModel.DoesNotExist:
+            self.kwargs['data_id'] = None  
+            return Response({'detail': 'Data not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer.save(user=self.request.user, data=data_instance)
 
 
 # 스크랩 전체조회

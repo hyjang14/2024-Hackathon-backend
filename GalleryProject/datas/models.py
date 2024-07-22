@@ -33,9 +33,19 @@ class Scrap(models.Model):
 # 댓글 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments',  default="")
+    username = models.CharField(max_length=150, blank=True, editable=False)
+    profile = models.URLField(max_length=200, blank=True, editable=False) 
     comment = models.CharField(verbose_name="댓글", max_length=128)
     data = models.ForeignKey(DataModel, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+
     def __str__(self):
         return self.comment
+    
+    def save(self, *args, **kwargs):
+        if not self.username:
+            self.username = self.user.username  # 유저네임을 자동으로 설정
+        if not self.profile and hasattr(self.user, 'profile'):
+            self.profile = self.user.profile.url 
+        super().save(*args, **kwargs)

@@ -17,7 +17,7 @@ urlpatterns = [
     path('', include(data_router.urls)),
     
     # 스크랩 생성
-    path('scraps/', ScrapCreateView.as_view(), name='scrap-create'),
+    path('scraps/<int:data_id>/', ScrapCreateView.as_view(), name='scrap-create'),
     # 스크랩 전체조회
     path('scraps/all/', ScrapView.as_view(), name='scrap-view'),
     # 특정 전시회의 스크랩 조회

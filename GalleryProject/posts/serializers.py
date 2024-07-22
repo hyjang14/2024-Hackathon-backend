@@ -3,9 +3,15 @@ from .models import Post, Analysis, Like
 from rest_framework import serializers
 
 class PostSerializer(ModelSerializer):
+    created_at = serializers.DateTimeField(format="%d/%m/%y %H:%M", read_only=True)
+    username = serializers.CharField(read_only=True)
+    profile = serializers.URLField(read_only=True)
+    writer = serializers.PrimaryKeyRelatedField(read_only=True)
+    view_at = serializers.DateTimeField(format="%Y-%m-%d", input_formats=["%Y-%m-%d"])
+
     class Meta:
         model = Post
-        fields = [ 'id', 'title', 'content', 'img', 'writer', 'view_at', 'created_at', 'like_count']
+        fields = [ 'id', 'title', 'content', 'img', 'writer', 'view_at', 'created_at', 'like_count', 'username', 'profile']
 
     def validate_title(self, value):
         if len(value) > 15:
