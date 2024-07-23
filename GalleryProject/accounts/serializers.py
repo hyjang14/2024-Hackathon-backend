@@ -4,6 +4,44 @@ from .models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
+# 로그인
+from dj_rest_auth.serializers import LoginSerializer
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate
+
+# 커스텀 로그인
+class CustomLoginSerializer(LoginSerializer):
+    def validate(self, attrs):
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        # 사용자 인증
+        self.user = authenticate(username=username, password=password)
+
+        if self.user is None:
+            raise serializers.ValidationError(('해당 사용자가 없습니다.'))
+
+        if not self.user.is_active:
+            raise serializers.ValidationError(('로그인 중이 아닙니다.'))
+
+        # super().validate 호출 전에 user를 attrs에 설정
+        attrs['user'] = self.user
+
+        # 기본 validate 메소드 호출
+        data = super().validate(attrs)
+
+        # 토큰 생성 또는 가져오기
+        token, created = Token.objects.get_or_create(user=self.user)
+
+        # 사용자 데이터 반환
+        data.update({
+            'token': token.key,
+            'usercode': self.user.id
+        })
+
+        return data
+    
+    
 # 회원가입
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})

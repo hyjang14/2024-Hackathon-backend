@@ -1,11 +1,29 @@
 from .models import User
-from .serializers import UserSerializer, UserUpdateSerializer, ProfileSerializer
+from .serializers import UserSerializer, UserUpdateSerializer, ProfileSerializer, CustomLoginSerializer
 from rest_framework import viewsets, generics, status
 from .permissions import CustomReadOnly
 from rest_framework.permissions import AllowAny
 
 from rest_framework.response import Response
 from rest_framework import serializers
+
+from dj_rest_auth.views import LoginView
+
+# 로그인
+class CustomLoginView(LoginView):
+    serializer_class = CustomLoginSerializer
+
+    def post(self, request, *args, **kwargs):
+
+        serializer = self.get_serializer(data=request.data)
+        print(f"Serializer is valid: {serializer.is_valid()}")
+        print(f"Validated data: {serializer.validated_data}")
+        
+        # 응답 데이터 반환
+        return Response({
+            'token': serializer.validated_data.get('token'),
+            'usercode': serializer.validated_data.get('usercode')
+        }, status=status.HTTP_200_OK)
 
 
 # 회원가입
