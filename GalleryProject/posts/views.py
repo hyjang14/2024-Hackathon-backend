@@ -16,7 +16,8 @@ import openai
 from django.conf import settings
 
 class PostViewSet(ModelViewSet): 
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by('-created_at') 
+    # queryset = Post.objects.all()
     serializer_class = PostSerializer
 
     def perform_create(self, serializer):

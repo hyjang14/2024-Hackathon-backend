@@ -68,7 +68,7 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # apps
-    'accounts', 'datas', 'posts', 'infos',
+    'accounts', 'datas', 'posts', 'books', 'musics',
 
     # cors 에러
     'corsheaders',
@@ -187,7 +187,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 

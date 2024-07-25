@@ -25,7 +25,8 @@ urlpatterns = [
     path('', include('accounts.urls')),
     path('', include('datas.urls')),
     path('', include('posts.urls')),
-    path('', include('infos.urls')),
+    path('', include('books.urls')),
+    path('', include('musics.urls')),
 ]
 
 # pillow

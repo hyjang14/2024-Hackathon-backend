@@ -31,9 +31,9 @@ class DataViewSet(ModelViewSet):
 
     pagination_class = None  # 페이지네이션 사용 안 함
 
-    queryset = DataModel.objects.all().order_by('id') # 모든 객체를 ID 순으로 정렬하여 쿼리셋으로 설정
+    queryset = DataModel.objects.all().order_by('-period') # 모든 객체를 ID 순으로 정렬하여 쿼리셋으로 설정
     serializer_class = DataSerializer # Serializers를 사용하여 데이터 직렬화
-    
+
     # 전시 검색 
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('title',) # 제목으로 검색할 수 있게 함

@@ -14,6 +14,20 @@ class DataModel(models.Model):
     contact = models.CharField(max_length=200, null=True) # CONTACT_POINT 전화번호
     audience = models.CharField(max_length=200, null=True) # AUDIENCE 전체관람
 
+    class Meta:
+        ordering = ['-period']
+
+    # 기본 이미지 URL 설정
+    DEFAULT_IMAGE_URL = 'http://127.0.0.1:8000/media/data_default.png'
+
+    def save(self, *args, **kwargs):
+        if not self.image:
+            self.image = self.DEFAULT_IMAGE_URL
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
+    
     def scrap_count(self):
         return self.scrap_set.count()
 
@@ -29,6 +43,7 @@ class Scrap(models.Model):
     class Meta:
         # 동일한 사용자가 동일한 데이터 중복으로 스크랩하지 못하게 함
         unique_together = ['user', 'data'] 
+        ordering = ['-created_at']
 
 # 댓글 
 class Comment(models.Model):
@@ -39,6 +54,8 @@ class Comment(models.Model):
     data = models.ForeignKey(DataModel, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.comment

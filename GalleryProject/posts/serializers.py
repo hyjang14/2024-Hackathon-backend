@@ -3,7 +3,7 @@ from .models import Post, Analysis, Like
 from rest_framework import serializers
 
 class PostSerializer(ModelSerializer):
-    created_at = serializers.DateTimeField(format="%d/%m/%y %H:%M", read_only=True)
+    created_at = serializers.DateTimeField(format="%y/%m/%d %H:%M", read_only=True)
     username = serializers.CharField(read_only=True)
     profile = serializers.URLField(read_only=True)
     writer = serializers.PrimaryKeyRelatedField(read_only=True)

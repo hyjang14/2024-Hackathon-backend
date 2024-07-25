@@ -7,13 +7,16 @@ User = get_user_model()
 class Post(models.Model) : 
     title = models.CharField(verbose_name="제목", max_length=128, null=False)
     content = models.TextField(verbose_name="내용", null=False) 
-    img = models.ImageField(verbose_name="사진", blank=True, upload_to='posts_photo')
+    img = models.ImageField(verbose_name="사진", blank=True, upload_to='posts_photo', default='post_default.png')
     view_at = models.DateTimeField(verbose_name="관람일", auto_now_add=True)
     created_at = models.DateTimeField(verbose_name="작성일", auto_now_add=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='posts_posts')
     username = models.CharField(max_length=150, blank=True, editable=False)
     profile = models.URLField(max_length=200, blank=True, editable=False) 
 
+    class Meta:
+        ordering = ['-created_at']
+        
      # 제목 15글자 제한
     def save(self, *args, **kwargs):
         if len(self.title) > 15:
