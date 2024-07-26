@@ -13,6 +13,7 @@ class Music(models.Model) :
     username = models.CharField(max_length=150, blank=True, editable=False)
     profile = models.URLField(max_length=200, blank=True, editable=False) 
     created_at2 = models.DateTimeField(verbose_name="작성일2", auto_now_add=True)
+    nickname = models.CharField(max_length=150, blank=True, editable=False)
 
     class Meta:
         ordering = ['-created_at']
@@ -23,6 +24,8 @@ class Music(models.Model) :
     def save(self, *args, **kwargs):
         if not self.username:
             self.username = self.writer.username  # 유저네임을 자동으로 설정
+        if not self.nickname and self.writer:
+            self.nickname = self.writer.nickname
         if not self.profile and hasattr(self.writer, 'profile'):
             self.profile = self.writer.profile.url 
         super().save(*args, **kwargs)

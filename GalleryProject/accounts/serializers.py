@@ -15,6 +15,9 @@ class CustomLoginSerializer(LoginSerializer):
         username = attrs.get('username')
         password = attrs.get('password')
 
+        if not User.objects.filter(username=username).exists():
+            raise serializers.ValidationError('해당 사용자가 없습니다.')
+        
         # 사용자 인증
         self.user = authenticate(username=username, password=password)
 
@@ -33,13 +36,16 @@ class CustomLoginSerializer(LoginSerializer):
         # 토큰 생성 또는 가져오기
         token, created = Token.objects.get_or_create(user=self.user)
 
-        # 사용자 데이터 반환
-        data.update({
-            'token': token.key,
-            'usercode': self.user.id
-        })
 
-        return data
+        # 사용자 데이터 반환
+        if User.objects.filter(username=username).exists():
+            data.update({
+                'token': token.key,
+                'usercode': self.user.id
+            })
+            return data
+
+        # return data
     
     
 # 회원가입

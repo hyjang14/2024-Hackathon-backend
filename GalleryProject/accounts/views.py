@@ -21,8 +21,8 @@ class CustomLoginView(LoginView):
         
         # 응답 데이터 반환
         return Response({
-            'token': serializer.validated_data.get('token'),
-            'usercode': serializer.validated_data.get('usercode')
+            'token': serializer.validated_data['token'],
+            'usercode': serializer.validated_data['usercode']
         }, status=status.HTTP_200_OK)
 
 

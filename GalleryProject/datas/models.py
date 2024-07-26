@@ -58,6 +58,7 @@ class Comment(models.Model):
     comment = models.CharField(verbose_name="댓글", max_length=128)
     data = models.ForeignKey(DataModel, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    nickname = models.CharField(max_length=150, blank=True, editable=False)
 
     class Meta:
         ordering = ['-created_at']
@@ -68,6 +69,8 @@ class Comment(models.Model):
     def save(self, *args, **kwargs):
         if not self.username:
             self.username = self.user.username  # 유저네임을 자동으로 설정
+        if not self.nickname and self.user:
+            self.nickname = self.user.nickname
         if not self.profile and hasattr(self.user, 'profile'):
             self.profile = self.user.profile.url 
         super().save(*args, **kwargs)

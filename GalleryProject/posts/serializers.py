@@ -7,12 +7,13 @@ class PostSerializer(ModelSerializer):
     created_at2 = serializers.DateTimeField(format="%m/%d", read_only=True)
     username = serializers.CharField(read_only=True)
     profile = serializers.URLField(read_only=True)
+    nickname = serializers.CharField(read_only=True)
     writer = serializers.PrimaryKeyRelatedField(read_only=True)
     view_at = serializers.DateTimeField(format="%Y-%m-%d", input_formats=["%Y-%m-%d"])
 
     class Meta:
         model = Post
-        fields = [ 'id', 'title', 'content', 'img', 'writer', 'view_at', 'created_at', 'created_at2', 'like_count', 'username', 'profile']
+        fields = [ 'id', 'title', 'content', 'img', 'writer', 'view_at', 'created_at', 'created_at2', 'like_count', 'username', 'profile', 'nickname']
 
     def validate_title(self, value):
         if len(value) > 15:

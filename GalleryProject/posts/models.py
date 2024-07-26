@@ -13,6 +13,7 @@ class Post(models.Model) :
     writer = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='posts_posts')
     username = models.CharField(max_length=150, blank=True, editable=False)
     profile = models.URLField(max_length=200, blank=True, editable=False) 
+    nickname = models.CharField(max_length=150, blank=True, editable=False)
     created_at2 = models.DateTimeField(verbose_name="작성일2", auto_now_add=True)
 
     class Meta:
@@ -24,6 +25,8 @@ class Post(models.Model) :
             raise ValidationError("제목은 15글자를 초과할 수 없습니다.")
         if not self.username:
             self.username = self.writer.username  # 유저네임을 자동으로 설정
+        if not self.nickname and self.writer:
+            self.nickname = self.writer.nickname  # 닉네임을 자동으로 설정
         if not self.profile and hasattr(self.writer, 'profile'):
             self.profile = self.writer.profile.url 
         super(Post, self).save(*args, **kwargs)

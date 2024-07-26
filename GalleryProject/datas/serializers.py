@@ -28,7 +28,8 @@ class CommentSerializer(serializers.ModelSerializer):
     profile = serializers.URLField(read_only=True)
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     data = serializers.PrimaryKeyRelatedField(read_only=True)
+    nickname = serializers.CharField(read_only=True)
 
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'data', 'comment', 'created_at', 'username', 'profile']
+        fields = ['id', 'user', 'data', 'comment', 'created_at', 'username', 'profile', 'nickname']
