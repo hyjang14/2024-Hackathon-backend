@@ -18,7 +18,7 @@ class ScrapSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Scrap
-        fields = ['id', 'user', 'data', 'created_at']
+        fields = ['id', 'user', 'data', 'created_at', 'is_scrapped']
 
 # 댓글
 class CommentSerializer(serializers.ModelSerializer):

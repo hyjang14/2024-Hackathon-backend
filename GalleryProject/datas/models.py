@@ -39,11 +39,16 @@ class Scrap(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='scraps')
     data = models.ForeignKey(DataModel, on_delete=models.CASCADE)  # 데이터 모델과 연결
     created_at = models.DateTimeField(auto_now_add=True)
+    is_scrapped = models.BooleanField(default=False)
 
     class Meta:
         # 동일한 사용자가 동일한 데이터 중복으로 스크랩하지 못하게 함
         unique_together = ['user', 'data'] 
         ordering = ['-created_at']
+
+    def toggle_scrap(self):
+        self.is_scrapped = not self.is_scrapped
+        self.save()
 
 # 댓글 
 class Comment(models.Model):

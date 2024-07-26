@@ -12,6 +12,7 @@ class Music(models.Model) :
     writer = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     username = models.CharField(max_length=150, blank=True, editable=False)
     profile = models.URLField(max_length=200, blank=True, editable=False) 
+    created_at2 = models.DateTimeField(verbose_name="작성일2", auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at']

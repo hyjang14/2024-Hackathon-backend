@@ -106,12 +106,13 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         instance.profile = validated_data.get('profile', instance.profile)
         instance.nickname = validated_data.get('nickname', instance.nickname)
         instance.phone = validated_data.get('phone', instance.phone)
+        instance.birthdate = validated_data.get('birthdate', instance.birthdate)
         instance.save()
         return instance
     
     class Meta:
         model = User
-        fields = ['id', 'profile', 'nickname', 'phone']  
+        fields = ['id', 'username', 'name', 'nickname', 'email', 'birthdate', 'phone', 'profile']
 
 # 회원정보 조회
 class ProfileSerializer(serializers.ModelSerializer):

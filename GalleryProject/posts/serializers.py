@@ -3,7 +3,8 @@ from .models import Post, Analysis, Like
 from rest_framework import serializers
 
 class PostSerializer(ModelSerializer):
-    created_at = serializers.DateTimeField(format="%y/%m/%d %H:%M", read_only=True)
+    created_at = serializers.DateTimeField(format="%m/%d %H:%M", read_only=True)
+    created_at2 = serializers.DateTimeField(format="%m/%d", read_only=True)
     username = serializers.CharField(read_only=True)
     profile = serializers.URLField(read_only=True)
     writer = serializers.PrimaryKeyRelatedField(read_only=True)
@@ -11,7 +12,7 @@ class PostSerializer(ModelSerializer):
 
     class Meta:
         model = Post
-        fields = [ 'id', 'title', 'content', 'img', 'writer', 'view_at', 'created_at', 'like_count', 'username', 'profile']
+        fields = [ 'id', 'title', 'content', 'img', 'writer', 'view_at', 'created_at', 'created_at2', 'like_count', 'username', 'profile']
 
     def validate_title(self, value):
         if len(value) > 15:
@@ -21,10 +22,14 @@ class PostSerializer(ModelSerializer):
     def get_like_count(self, obj):
         return obj.like_count()
 
+# 좋아요
 class LikeSerializer(ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    post = serializers.PrimaryKeyRelatedField(read_only=True)
+
     class Meta:
         model = Like
-        fields = ['id', 'user', 'post', 'created_at']
+        fields = ['id', 'user', 'post', 'created_at', 'is_liked']
     
 
 class AnalysisSerializer(ModelSerializer):

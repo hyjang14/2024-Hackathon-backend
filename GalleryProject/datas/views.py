@@ -117,6 +117,14 @@ class ScrapCreateView(generics.CreateAPIView):
             self.kwargs['data_id'] = None  
             return Response({'detail': 'Data not found.'}, status=status.HTTP_404_NOT_FOUND)
 
+        scrap, created = Scrap.objects.get_or_create(user=self.request.user, data=data_instance)
+
+        # 스크랩 상태를 토글합니다.
+        scrap.toggle_scrap()
+
+        # 새로운 스크랩이 생성되었거나 기존 스크랩의 상태가 변경된 것을 저장합니다.
+        serializer.instance = scrap
+
         serializer.save(user=self.request.user, data=data_instance)
 
 
@@ -124,6 +132,9 @@ class ScrapCreateView(generics.CreateAPIView):
 class ScrapView(generics.ListAPIView):
     queryset = Scrap.objects.all()
     serializer_class = ScrapSerializer
+
+    def get_queryset(self):
+        return Scrap.objects.filter(user=self.request.user)
 
 
 # 특정전시 스크랩 조회

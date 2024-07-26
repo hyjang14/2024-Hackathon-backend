@@ -15,28 +15,66 @@ from rest_framework import status
 import openai
 from django.conf import settings
 
+# 기록글 검색
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
+
+
+# 기록글 전체보기
 class PostViewSet(ModelViewSet): 
     queryset = Post.objects.all().order_by('-created_at') 
     # queryset = Post.objects.all()
     serializer_class = PostSerializer
 
+    # 후기글 검색 
+    filter_backends = (DjangoFilterBackend, SearchFilter)
+    search_fields = ('title', 'content') # 후기글 제목으로 검색할 수 있게 함
+
     def perform_create(self, serializer):
         serializer.save(writer = self.request.user)
 
+
+# 내 기록글만 보기
+class MyPostViewSet(ModelViewSet):
+    queryset = Post.objects.all().order_by('-created_at')
+    serializer_class = PostSerializer
+
+    def get_queryset(self):
+        return Post.objects.filter(writer=self.request.user)
 
 
 # 좋아요 생성
 class LikeCreateView(generics.CreateAPIView):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
-
+    
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        post_id = self.kwargs.get('post_id')
+
+        try:
+            post_instance = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            self.kwargs['post_id'] = None  
+            return Response({'detail': 'Post not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        like, created = Like.objects.get_or_create(user=self.request.user, post=post_instance)
+
+        # 좋아요 상태를 토글합니다.
+        like.toggle_like()
+
+        # 새로운 좋아요이 생성되었거나 기존 좋아요의 상태가 변경된 것을 저장합니다.
+        serializer.instance = like
+
+        serializer.save(user=self.request.user, post=post_instance)
+
+
 
 # 좋아요 전체조회
 class LikeView(generics.ListAPIView):
     queryset = Like.objects.all()
     serializer_class = LikeSerializer
+
+
 
 # 특정 기록 좋아요 조회
 class PostLikeListView(generics.ListAPIView):
