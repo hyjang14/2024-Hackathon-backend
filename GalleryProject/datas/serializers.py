@@ -15,10 +15,14 @@ class DataSerializer(serializers.ModelSerializer):
 class ScrapSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
     data = serializers.PrimaryKeyRelatedField(read_only=True)
+    title = serializers.CharField(read_only=True)
+    image = serializers.URLField(read_only=True)
+    period = serializers.CharField(read_only=True)
+    place = serializers.CharField(read_only=True)
     
     class Meta:
         model = Scrap
-        fields = ['id', 'user', 'data', 'created_at', 'is_scrapped']
+        fields = ['id', 'user', 'data', 'created_at', 'is_scrapped', 'title', 'image', 'period', 'place']
 
 # 댓글
 class CommentSerializer(serializers.ModelSerializer):
