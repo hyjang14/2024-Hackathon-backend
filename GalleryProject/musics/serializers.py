@@ -9,7 +9,8 @@ class MusicSerializer(ModelSerializer):
     profile = serializers.URLField(read_only=True)
     writer = serializers.PrimaryKeyRelatedField(read_only=True)
     nickname = serializers.CharField(read_only=True)
+    data = serializers.PrimaryKeyRelatedField(read_only=True) 
 
     class Meta:
         model = Music
-        fields = [ 'id', 'title', 'author', 'content', 'image', 'writer', 'created_at', 'created_at2', 'username', 'profile', 'nickname']
+        fields = [ 'id', 'title', 'author', 'content', 'image', 'writer', 'created_at', 'created_at2', 'username', 'profile', 'nickname', 'data']

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from datas.models import DataModel
 
 User = get_user_model()
 
@@ -14,6 +15,7 @@ class Book(models.Model) :
     profile = models.URLField(max_length=200, blank=True, editable=False) 
     nickname = models.CharField(max_length=150, blank=True, editable=False)
     created_at2 = models.DateTimeField(verbose_name="작성일2", auto_now_add=True)
+    data = models.ForeignKey(DataModel, on_delete=models.CASCADE)  # 데이터 모델과 연결
 
     class Meta:
         ordering = ['-created_at']

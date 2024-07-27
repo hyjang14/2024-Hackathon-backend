@@ -2,9 +2,10 @@ from rest_framework.serializers import ModelSerializer
 from .models import Post, Analysis, Like
 from rest_framework import serializers
 
+# 기록하기
 class PostSerializer(ModelSerializer):
     created_at = serializers.DateTimeField(format="%m/%d %H:%M", read_only=True)
-    created_at2 = serializers.DateTimeField(format="%m/%d", read_only=True)
+    created_at2 = serializers.DateTimeField(format="%Y/%m/%d", read_only=True)
     username = serializers.CharField(read_only=True)
     profile = serializers.URLField(read_only=True)
     nickname = serializers.CharField(read_only=True)
@@ -33,6 +34,7 @@ class LikeSerializer(ModelSerializer):
         fields = ['id', 'user', 'post', 'created_at', 'is_liked']
     
 
+# 분석
 class AnalysisSerializer(ModelSerializer):
     post = PostSerializer()
 

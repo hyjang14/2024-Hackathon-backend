@@ -6,5 +6,5 @@ book_router = SimpleRouter(trailing_slash=True)
 book_router.register('books', BookViewSet, basename='book')
 
 urlpatterns = [
-    path('', include(book_router.urls)),
+    path('datas/<int:exhibition_id>/', include(book_router.urls)),
 ]

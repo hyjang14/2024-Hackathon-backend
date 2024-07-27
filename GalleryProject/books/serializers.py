@@ -1,5 +1,6 @@
 from rest_framework.serializers import ModelSerializer
 from .models import Book
+from datas.models import DataModel
 from rest_framework import serializers
 
 class BookSerializer(ModelSerializer):
@@ -10,7 +11,9 @@ class BookSerializer(ModelSerializer):
     writer = serializers.PrimaryKeyRelatedField(read_only=True)
     image = serializers.ImageField(required=False)
     nickname = serializers.CharField(read_only=True)
+    data = serializers.PrimaryKeyRelatedField(read_only=True) 
 
     class Meta:
         model = Book
-        fields = [ 'id', 'title', 'author', 'content', 'image', 'writer', 'created_at', 'created_at2', 'username', 'profile', 'nickname']
+        fields = [ 'id', 'title', 'author', 'content', 'image', 'writer', 'created_at', 'created_at2', 'username', 'profile', 'nickname', 'data']
+
