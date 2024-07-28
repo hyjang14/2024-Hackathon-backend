@@ -24,10 +24,9 @@ class Music(models.Model) :
         return self.title
 
     def save(self, *args, **kwargs):
-        if not self.username:
-            self.username = self.writer.username  # 유저네임을 자동으로 설정
-        if not self.nickname and self.writer:
-            self.nickname = self.writer.nickname
-        if not self.profile and hasattr(self.writer, 'profile'):
-            self.profile = self.writer.profile.url 
+       if self.writer:
+        self.username = self.writer.username  # 유저네임을 자동으로 설정
+        self.nickname = self.writer.nickname  # 닉네임을 항상 최신으로 설정
+        if hasattr(self.writer, 'profile'):
+            self.profile = self.writer.profile.url
         super().save(*args, **kwargs)

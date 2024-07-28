@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -8,7 +9,7 @@ class Post(models.Model) :
     title = models.CharField(verbose_name="제목", max_length=128, null=False)
     content = models.TextField(verbose_name="내용", null=False) 
     img = models.ImageField(verbose_name="사진", blank=True, upload_to='posts_photo', default='posts_photo/post_default.png')
-    view_at = models.DateTimeField(verbose_name="관람일", auto_now_add=True)
+    view_at = models.DateTimeField(verbose_name="관람일", null=True, blank=True)
     created_at = models.DateTimeField(verbose_name="작성일", auto_now_add=True)
     writer = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='posts_posts')
     username = models.CharField(max_length=150, blank=True, editable=False)
@@ -23,6 +24,8 @@ class Post(models.Model) :
     def save(self, *args, **kwargs):
         if len(self.title) > 15:
             raise ValidationError("제목은 15글자를 초과할 수 없습니다.")
+        if not self.view_at:
+            self.view_at = timezone.now()
         if not self.username:
             self.username = self.writer.username  # 유저네임을 자동으로 설정
         if not self.nickname and self.writer:

@@ -5,12 +5,12 @@ from rest_framework import serializers
 # 기록하기
 class PostSerializer(ModelSerializer):
     created_at = serializers.DateTimeField(format="%m/%d %H:%M", read_only=True)
-    created_at2 = serializers.DateTimeField(format="%Y/%m/%d", read_only=True)
+    created_at2 = serializers.DateTimeField(format="%m/%d", read_only=True)
     username = serializers.CharField(read_only=True)
     profile = serializers.URLField(read_only=True)
     nickname = serializers.CharField(read_only=True)
     writer = serializers.PrimaryKeyRelatedField(read_only=True)
-    view_at = serializers.DateTimeField(format="%Y-%m-%d", input_formats=["%Y-%m-%d"])
+    view_at = serializers.DateTimeField(required=False, format="%Y-%m-%d", input_formats=["%Y-%m-%d"])
 
     class Meta:
         model = Post

@@ -6,6 +6,9 @@ from datas.models import DataModel
 from datas.serializers import DataSerializer
 import re
 
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwnerOrReadOnly  # 커스텀 권한 클래스 임포트
+
 # 좋아요
 from rest_framework import generics
 from django.http import Http404
@@ -24,9 +27,11 @@ from rest_framework.filters import SearchFilter
 
 # 기록글 전체보기
 class PostViewSet(ModelViewSet): 
-    queryset = Post.objects.all().order_by('-created_at') 
-    # queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
+
+    # 자신이 쓴 글만 수정/삭제할 수 있도록
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     # 후기글 검색 
     filter_backends = (DjangoFilterBackend, SearchFilter)

@@ -9,6 +9,12 @@ from rest_framework import serializers
 
 from dj_rest_auth.views import LoginView
 
+from musics.models import Music
+from books.models import Book
+from posts.models import Post
+from datas.models import DataModel, Comment
+
+
 # 로그인
 class CustomLoginView(LoginView):
     serializer_class = CustomLoginSerializer
@@ -51,6 +57,28 @@ class UserUpdateView(generics.UpdateAPIView):
 
     def get_object(self):
         return self.request.user
+    
+    def perform_update(self, serializer):
+        user = self.get_object()
+        new_nickname = serializer.validated_data['nickname']
+        # new_profile_image = serializer.validated_data['profile']
+
+        super().perform_update(serializer)
+
+        
+        # 사용자가 작성한 모든 글의 닉네임을 업데이트
+        Music.objects.filter(writer=user).update(nickname=new_nickname)
+        Book.objects.filter(writer=user).update(nickname=new_nickname)
+        Post.objects.filter(writer=user).update(nickname=new_nickname)
+        Comment.objects.filter(user=user).update(nickname=new_nickname)
+
+        # if new_profile_image:
+        profile_image_url = user.profile.url
+        Music.objects.filter(writer=user).update(profile=profile_image_url)
+        Book.objects.filter(writer=user).update(profile=profile_image_url)
+        Post.objects.filter(writer=user).update(profile=profile_image_url)
+        Comment.objects.filter(user=user).update(profile=profile_image_url)
+
     
 # 회원정보 조회
 class ProfileView(generics.RetrieveUpdateAPIView):
