@@ -93,3 +93,25 @@ class Comment(models.Model):
         if not self.profile and hasattr(self.user, 'profile'):
             self.profile = self.user.profile.url 
         super().save(*args, **kwargs)
+
+# 별점
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    exhibition = models.ForeignKey(DataModel, on_delete=models.CASCADE, related_name='ratings')
+    rating = models.FloatField(default=0.0)
+
+    class Meta:
+        unique_together = ('user', 'exhibition')
+
+    def __str__(self):
+        return f'{self.user} - {self.exhibition} - {self.rating}'
+
+    @property
+    def average_rating(self):
+        ratings = Rating.objects.filter(exhibition=self.exhibition)
+        total = sum(r.rating for r in ratings)
+        return total / ratings.count()
+
+    @property
+    def rating_count(self):
+        return Rating.objects.filter(exhibition=self.exhibition).count()

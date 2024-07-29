@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
-from .views import DataViewSet, Dataload, ScrapCreateView, ScrapDeleteView, ScrapView, ExhibitionScrapListView, CommentViewSet
+from .views import DataViewSet, Dataload, ScrapCreateView, ScrapDeleteView, ScrapView, ExhibitionScrapListView, CommentViewSet, RatingViewSet
 
 
 data_router = SimpleRouter()
@@ -27,4 +27,8 @@ urlpatterns = [
 
     # 댓글
     path('datas/<int:exhibition_id>/', include(comment_router.urls)),
+
+    # 별점
+    path('datas/<int:pk>/rate/', DataViewSet.as_view({'post': 'rate'}), name='data-rate'), # 별점 평가
+    path('datas/<int:pk>/ratings/', DataViewSet.as_view({'get': 'get_ratings'}), name='data-get-ratings') # 별점 조회
 ]

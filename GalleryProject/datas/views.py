@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from .models import DataModel, Scrap, Comment # model
-from .serializers import DataSerializer, ScrapSerializer, CommentSerializer # serializer
+from .models import DataModel, Scrap, Comment, Rating # model
+from .serializers import DataSerializer, ScrapSerializer, CommentSerializer, RatingSerializer # serializer
 
 # 스크랩
 from rest_framework import generics
@@ -24,6 +24,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOrReadOnly  # 커스텀 권한 클래스 임포트
 
+# 별점
+from rest_framework.decorators import action
+from django.db.models import Avg, Count
+
+
 
 class DataViewSet(ModelViewSet):
     # 인증없어도 누구나 할 수 있도록 함
@@ -37,6 +42,41 @@ class DataViewSet(ModelViewSet):
     # 전시 검색 
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('title',) # 제목으로 검색할 수 있게 함
+
+    # 별점 평가
+    @action(detail=True, methods=['post'], url_path='rate')
+    def rate(self, request, pk=None):
+        exhibition = self.get_object()
+        user = request.user
+        rating_value = request.data.get('rating')
+
+        if not rating_value or not (0.5 <= float(rating_value) <= 5.0) or float(rating_value) % 0.5 != 0:
+            return Response({'error': 'Invalid rating value'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        rating, created = Rating.objects.get_or_create(user=user, exhibition=exhibition)
+        rating.rating = rating_value
+        rating.save()
+
+        return Response({'status': 'rating set', 'rating': rating_value})
+
+    # 별점 조회
+    @action(detail=True, methods=['get'], url_path='ratings')
+    def get_ratings(self, request, pk=None):
+        exhibition = self.get_object()
+        average_rating = exhibition.ratings.aggregate(Avg('rating'))['rating__avg']
+        if average_rating is None:
+            average_rating = 0.0
+        else:
+            average_rating = round(average_rating, 1)
+        rating_count = exhibition.ratings.aggregate(Count('id'))['id__count']
+        ratings = exhibition.ratings.all()
+        ratings_data = RatingSerializer(ratings, many=True).data
+
+        return Response({
+            'averageRating': average_rating, 
+            'ratingCount': rating_count,
+            'ratings': ratings_data
+        })
 
 def Dataload(request):
     time.sleep(3)  # 1초간의 지연을 추가합니다.
@@ -185,3 +225,8 @@ class CommentViewSet(ModelViewSet):
         if exhibition_id:
             return self.queryset.filter(data=exhibition_id)
         return self.queryset
+
+# 별점
+class RatingViewSet(ModelViewSet):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
