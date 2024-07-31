@@ -97,9 +97,10 @@ def Dataload(request):
         # 'PERIOD'가 연도를 포함하는지 확인하고 필터링
         try:
             period_year = int(period_text[:4])  # 첫 4자리를 연도로 파싱
+            period_month = int(period_text[5:7])
         except ValueError:
             continue 
-        if period_year >= 2019:
+        if period_year > 2019 or (period_year == 2019 and period_month >= 3):
             item_dict = {
                 'TITLE': item.find('TITLE').text,
                 'DESCRIPTION': item.find('DESCRIPTION').text,

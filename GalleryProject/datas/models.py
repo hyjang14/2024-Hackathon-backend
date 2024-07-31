@@ -40,10 +40,10 @@ class Scrap(models.Model):
     data = models.ForeignKey(DataModel, on_delete=models.CASCADE)  # 데이터 모델과 연결
     created_at = models.DateTimeField(auto_now_add=True)
     is_scrapped = models.BooleanField(default=False)
-    title = models.CharField(max_length=150, blank=True, editable=False) # TITLE 제목
-    image = models.URLField(max_length=150, blank=True, editable=False) # IAMGE_OBJECT 이미지주소
-    period = models.CharField(max_length=150, blank=True, editable=False) # PERIOD 기간
-    place = models.CharField(max_length=150, blank=True, editable=False) # CNTC_INSTT_NM 장소
+    title = models.CharField(max_length=200, blank=True, editable=False) # TITLE 제목
+    image = models.URLField(blank=True, editable=False) # IAMGE_OBJECT 이미지주소
+    period = models.CharField(max_length=200, blank=True, editable=False) # PERIOD 기간
+    place = models.CharField(max_length=200, blank=True, editable=False) # CNTC_INSTT_NM 장소
 
     class Meta:
         # 동일한 사용자가 동일한 데이터 중복으로 스크랩하지 못하게 함
@@ -74,7 +74,7 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments',  default="")
     username = models.CharField(max_length=150, blank=True, editable=False)
     profile = models.URLField(max_length=200, blank=True, editable=False) 
-    comment = models.CharField(verbose_name="댓글", max_length=128)
+    comment = models.CharField(verbose_name="댓글", max_length=300)
     data = models.ForeignKey(DataModel, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     nickname = models.CharField(max_length=150, blank=True, editable=False)

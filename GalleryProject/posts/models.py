@@ -6,8 +6,8 @@ from django.utils import timezone
 User = get_user_model()
 
 class Post(models.Model) : 
-    title = models.CharField(verbose_name="제목", max_length=128, null=False)
-    content = models.TextField(verbose_name="내용", null=False) 
+    title = models.CharField(verbose_name="제목", max_length=15, null=False)
+    content = models.TextField(verbose_name="내용", null=False, max_length=300) 
     img = models.ImageField(verbose_name="사진", blank=True, upload_to='posts_photo', default='posts_photo/post_default.png')
     view_at = models.DateTimeField(verbose_name="관람일", null=True, blank=True)
     created_at = models.DateTimeField(verbose_name="작성일", auto_now_add=True)
