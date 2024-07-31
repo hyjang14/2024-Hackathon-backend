@@ -5,8 +5,8 @@ from django.contrib.auth import get_user_model # 커스텀유저 모델 가져�
 class DataModel(models.Model):
     title = models.CharField(max_length=200) # TITLE 제목
     description = models.CharField(max_length=1000, null=True) # DESCRIPTION 소개(설명)
-    image = models.URLField(max_length=200, null=True) # IAMGE_OBJECT 이미지주소
-    pageUrl = models.URLField(max_length=200, null=True) # URL 홈페이지 주소
+    image = models.URLField(max_length=1000, null=True) # IAMGE_OBJECT 이미지주소
+    pageUrl = models.URLField(max_length=1000, null=True) # URL 홈페이지 주소
     author = models.CharField(max_length=200, null=True) # AUTHOR 작가
     period = models.CharField(max_length=200, null=True) # PERIOD 기간
     time = models.CharField(max_length=200, null=True) # EVENT_PERIOD 관람시간
