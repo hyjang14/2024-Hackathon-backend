@@ -53,7 +53,19 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
     password_confirm = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
     profile = serializers.ImageField(required=False)
-    
+    nickname = serializers.CharField(
+        max_length=8,
+        error_messages={
+            'max_length': '닉네임은 8자 이내로 설정해주세요.'
+        }
+    )
+
+    # 닉네임 중복 유효성 검사
+    def validate_nickname(self, value):
+        if User.objects.filter(nickname=value).exists():
+            raise serializers.ValidationError("이미 사용중인 닉네임입니다.")
+        return value
+
     class Meta:
         model = User
         fields = ['id', 'username', 'password', 'password_confirm', 'name', 'nickname', 'email', 'birthdate', 'phone', 'profile']
@@ -101,12 +113,18 @@ class UserSerializer(serializers.ModelSerializer):
 
 # 회원정보 수정
 class UserUpdateSerializer(serializers.ModelSerializer):
+    nickname = serializers.CharField(
+        max_length=8,
+        error_messages={
+            'max_length': '닉네임은 8자 이내로 설정해주세요.'
+        }
+    )
    
-   # 닉네임 중복 유효성 검사
+    # 닉네임 중복 유효성 검사
     def validate_nickname(self, value):
         user = self.context['request'].user
         if User.objects.filter(nickname=value).exclude(id=user.id).exists():
-            raise serializers.ValidationError("이미 존재하는 닉네임입니다.")
+            raise serializers.ValidationError("이미 사용중인 닉네임입니다.")
         return value
     
     def update(self, instance, validated_data):
