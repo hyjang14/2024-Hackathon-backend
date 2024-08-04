@@ -48,22 +48,22 @@ class DataViewSet(ModelViewSet):
     def rate(self, request, pk=None):
         exhibition = self.get_object()
         user = request.user
-        rating_value = request.data.get('rating')
+        rating_value = request.data.get('score') 
 
-        if not rating_value or not (0.5 <= float(rating_value) <= 5.0) or float(rating_value) % 0.5 != 0:
-            return Response({'error': 'Invalid rating value'}, status=status.HTTP_400_BAD_REQUEST)
+        # if not rating_value or not (0.5 <= float(rating_value) <= 5.0) or float(rating_value) % 0.5 != 0:
+        #     return Response({'error': 'Invalid rating value'}, status=status.HTTP_400_BAD_REQUEST)
         
-        rating, created = Rating.objects.get_or_create(user=user, exhibition=exhibition)
-        rating.rating = rating_value
+        rating, created = Rating.objects.get_or_create(user=user, item=exhibition)
+        rating.score = rating_value
         rating.save()
 
-        return Response({'status': 'rating set', 'rating': rating_value})
+        return Response({'status': 'rating set', 'score': rating_value})
 
     # 별점 조회
     @action(detail=True, methods=['get'], url_path='ratings')
     def get_ratings(self, request, pk=None):
         exhibition = self.get_object()
-        average_rating = exhibition.ratings.aggregate(Avg('rating'))['rating__avg']
+        average_rating = exhibition.ratings.aggregate(Avg('score'))['score__avg']
         if average_rating is None:
             average_rating = 0.0
         else:

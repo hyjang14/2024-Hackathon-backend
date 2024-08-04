@@ -7,12 +7,15 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import IsOwnerOrReadOnly  # 커스텀 권한 클래스 임포트
 
 from rest_framework.exceptions import NotFound
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
-
+@method_decorator(csrf_exempt, name='dispatch')
 class MusicViewSet(ModelViewSet): 
     queryset = Music.objects.all()
     serializer_class = MusicSerializer
     # 자신이 쓴 글만 수정/삭제할 수 있도록
+    
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):

@@ -6,7 +6,7 @@ from django.utils import timezone
 User = get_user_model()
 
 class Post(models.Model) : 
-    title = models.CharField(verbose_name="제목", max_length=15, null=False)
+    title = models.CharField(verbose_name="제목", max_length=30, null=False)
     content = models.TextField(verbose_name="내용", null=False, max_length=300) 
     img = models.ImageField(verbose_name="사진", blank=True, upload_to='posts_photo', default='posts_photo/post_default.png')
     view_at = models.DateTimeField(verbose_name="관람일", null=True, blank=True)
@@ -22,8 +22,8 @@ class Post(models.Model) :
         
      # 제목 15글자 제한
     def save(self, *args, **kwargs):
-        if len(self.title) > 15:
-            raise ValidationError("제목은 15글자를 초과할 수 없습니다.")
+        # if len(self.title) > 30:
+        #     raise ValidationError("제목은 30글자를 초과할 수 없습니다.")
         if not self.view_at:
             self.view_at = timezone.now()
         if not self.username:

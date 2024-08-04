@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import SimpleRouter
 from . import views
-from .views import UserUpdateView, ProfileView, CustomLoginView
+from .views import UserUpdateView, ProfileView, CustomLoginView, LogoutView
 
 user_router = SimpleRouter()
 user_router.register('user',views.UserViewSet)
@@ -9,6 +9,7 @@ user_router.register('user',views.UserViewSet)
 urlpatterns = [
     # 로그인
     path('rest-auth/login/', CustomLoginView.as_view(), name='rest_login'),
+    path('logout/', LogoutView.as_view(), name='api-logout'),
     
     # 회원가입
     path('',include(user_router.urls)),

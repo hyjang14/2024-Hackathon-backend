@@ -22,19 +22,37 @@ load_dotenv(dotenv_path=env_path)
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+# BASE_DIR = Path(__file__).resolve().parent.parent
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+ROOT_DIR = os.path.dirname(BASE_DIR)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-xzwj&*rwfi9rakb%ln959g*4#mzar@-h)ybkjiawgq)60um=j_'
+import os, json
+from django.core.exceptions import ImproperlyConfigured
+
+
+secret_file = os.path.join(BASE_DIR, 'secrets.json') # secrets.json 파일 위치
+
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting, secrets=secrets):
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = "Set the {} environment variable".format(setting)
+        raise ImproperlyConfigured(error_msg)
+
+SECRET_KEY = get_secret("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # custom user 설정(accounts)
 AUTH_USER_MODEL = 'accounts.User'
@@ -42,9 +60,9 @@ AUTH_USER_MODEL = 'accounts.User'
 # pillow 관련(이미지)
 import os
 
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-MEDIA_URL = '/media/'
 
 # Application definition
 
@@ -105,7 +123,16 @@ CORS_ALLOW_METHODS = [
 	'POST',
 	'PUT',
 ]
-
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # 로컬 개발 서버 주소
+    "http://52.79.34.113",     # 배포 서버 주소
+    # 추가적으로 다른 도메인도 필요에 따라 추가할 수 있습니다.
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://yourdomain.com",
+    "http://localhost:3000",
+]
 # drf 인증 패키지 추가
 REST_FRAMEWORK = { 
 	'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -138,7 +165,7 @@ ROOT_URLCONF = 'GalleryProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['client'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -157,10 +184,29 @@ WSGI_APPLICATION = 'GalleryProject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# mysql DB 관련
+import pymysql
+
+pymysql.install_as_MySQLdb()
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql', # engine: mysql
+        'NAME' : 'hackathon', # DB Name
+        'USER' : 'hackathon', # DB User
+        'PASSWORD' : 'hackathon', # Password
+        'HOST': '52.79.34.113',
+        'PORT': '3306', # 데이터베이스 포트
+        'OPTIONS':{
+            'init_command' : "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4',
+        }
     }
 }
 
@@ -199,8 +245,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "client/static",
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # 정적 파일이 수집될 디렉토리
+# STATICFILES_DIRS = [
+#         # 실제 static 파일은 모두 client 측에서 소유
+#         os.path.join(ROOT_DIR, 'client/static')
+#     ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
